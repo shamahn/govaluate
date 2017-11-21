@@ -3,12 +3,13 @@ package govaluate
 import (
 	"errors"
 	"fmt"
+	"sync"
 )
 
 const isoDateFormat string = "2006-01-02T15:04:05.999999999Z0700"
 const shortCircuitHolder int = -1
 
-var DUMMY_PARAMETERS = MapParameters(map[string]interface{}{})
+var DUMMY_PARAMETERS = NewMapParameters(sync.Map{})
 
 /*
 	EvaluableExpression represents a set of ExpressionTokens which, taken together,
@@ -128,13 +129,12 @@ func NewEvaluableExpressionWithFunctions(expression string, functions map[string
 /*
 	Same as `Eval`, but automatically wraps a map of parameters into a `govalute.Parameters` structure.
 */
-func (this EvaluableExpression) Evaluate(parameters map[string]interface{}) (interface{}, error) {
-
-	if parameters == nil {
+func (this EvaluableExpression) Evaluate(parameters sync.Map) (interface{}, error) {
+	/*if parameters == nil {
 		return this.Eval(nil)
-	}
+	}*/
 
-	return this.Eval(MapParameters(parameters))
+	return this.Eval(NewMapParameters(parameters))
 }
 
 /*

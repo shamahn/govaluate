@@ -2,6 +2,7 @@ package govaluate
 
 import (
 	"errors"
+	"sync"
 )
 
 /*
@@ -17,11 +18,19 @@ type Parameters interface {
 	Get(name string) (interface{}, error)
 }
 
-type MapParameters map[string]interface{}
+type MapParameters struct {
+	Parameters
+	m sync.Map
+}
+
+func NewMapParameters(in sync.Map) MapParameters {
+	mp := MapParameters{}
+	mp.m = in
+	return mp
+}
 
 func (p MapParameters) Get(name string) (interface{}, error) {
-
-	value, found := p[name]
+	value, found := p.m.Load(name)
 
 	if !found {
 		errorMessage := "No parameter '" + name + "' found."
